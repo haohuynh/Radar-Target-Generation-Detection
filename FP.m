@@ -87,30 +87,32 @@ end
 %% RANGE MEASUREMENT
 
 
- % *%TODO* :
+ % ** :
 %reshape the vector into Nr*Nd array. Nr and Nd here would also define the size of
 %Range and Doppler FFT respectively.
+Mix=reshape(Mix,[Nr,Nd]);
 
- % *%TODO* :
+ % ** :
 %run the FFT on the beat signal along the range bins dimension (Nr) and
 %normalize.
+sig_fft = fft(Mix,Nr)/Nr;
 
- % *%TODO* :
+ % ** :
 % Take the absolute value of FFT output
+sig_fft = abs(sig_fft);
 
- % *%TODO* :
+ % ** :
 % Output of FFT is double sided signal, but we are interested in only one side of the spectrum.
 % Hence we throw out half of the samples.
-
+sig_fft = sig_fft(1:Nr/2+1);
 
 %plotting the range
 figure ('Name','Range from First FFT')
 subplot(2,1,1)
 
- % *%TODO* :
+ % ** :
  % plot FFT output 
-
- 
+plot(sig_fft); 
 axis ([0 200 0 1]);
 
 
