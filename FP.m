@@ -163,13 +163,14 @@ Gd = 4;
 
 % ** :
 % offset the threshold by SNR value in dB
-offset = 6;
+offset = 7.5;
 
 % ** :
 %Create a vector to store noise_level for each iteration on training cells
 %noise_level = zeros(1,1);
 %See the below loop for the elimination of such as a vector
 Nr = Nr/2; % See RANGE DOPPLER RESPONSE
+CFAR = RDM;
 
 % ** :
 %design a loop such that it slides the CUT across range doppler map by
@@ -197,25 +198,26 @@ for i = Tr+Gr+1 : Nr-(Tr+Gr)
         threshold = pow2db(noise_level/(2*(Td+Gd+1)*2*(Tr+Gr+1) - (Gr*Gd) - 1)) + offset;
 
         if(RDM(i,j)>threshold)
-            RDM(i,j) = 1;
+            CFAR(i,j) = 1;
         else
-            RDM(i,j) = 0;
+            CFAR(i,j) = 0;
         end
 
     end
 end
+
 % ** :
 % The process above will generate a thresholded block, which is smaller 
 %than the Range Doppler Map as the CUT cannot be located at the edges of
 %matrix. Hence,few cells will not be thresholded. To keep the map size same
 % set those values to 0. 
-RDM(RDM ~= 0 & RDM ~= 1) = 0;
+CFAR(CFAR ~= 0 & CFAR ~= 1) = 0;
 
 
 % ** :
 %display the CFAR output using the Surf function like we did for Range
 %Doppler Response output.
-figure,surf(doppler_axis,range_axis,RDM);
+figure,surf(doppler_axis,range_axis,CFAR);
 colorbar;
 
 
