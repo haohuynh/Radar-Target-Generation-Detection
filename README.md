@@ -40,16 +40,23 @@ offset = 6;
 (7) If the CUT level > threshold assign it a value of 1, else equate it to 0.
 
 for i = Tr+Gr+1 : Nr-(Tr+Gr)
+
     for j = Td+Gd+1 : Nd-(Td+Gd)
+    
         noise_level = zeros(1,1);
-   % Use RDM[x,y] as the matrix from the output of 2D FFT for implementing
-   % CFAR
+   
         for p = i-(Tr+Gr) : i+Tr+Gr
+        
             for q = j-(Td+Gd) : j+Td+Gd 
+            
                 if (abs(i-p)>Gr || abs(j-q)>Gd)
+                
                     noise_level = noise_level + db2pow(RDM(p,q));
+                    
                 end
+                
             end
+            
         end
     
         threshold = pow2db(noise_level/(2*(Td+Gd+1)*2*(Tr+Gr+1) - (Gr*Gd) - 1)) + offset;
@@ -61,6 +68,7 @@ for i = Tr+Gr+1 : Nr-(Tr+Gr)
         end
 
     end
+    
 end
 
 
