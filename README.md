@@ -70,9 +70,9 @@ for i = Tr+Gr+1 : Nr-(Tr+Gr)
         % Steps (6) and (7)
         
         if(RDM(i,j)>threshold)
-            RDM(i,j) = 1;
+            CFAR(i,j) = 1;
         else
-            RDM(i,j) = 0;
+            CFAR(i,j) = 0;
         end
 
     end
@@ -84,4 +84,4 @@ end
 
 To keep the map size same as it was before CFAR, equate all the non-thresholded cells to 0.
 
-RDM(RDM ~= 0 & RDM ~= 1) = 0;
+CFAR(CFAR ~= 0 & CFAR ~= 1) = 0;
