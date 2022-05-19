@@ -14,7 +14,7 @@ clc;
 % ** :
 % define the target's initial position and velocity. Note : Velocity
 % remains contant
-range = 168;   %[0, 200] (m)
+range = 68;   %[0, 200] (m)
 velocity = 36; %[-70, 70] (m/s)
 
 
@@ -65,20 +65,22 @@ td=zeros(1,length(t));
 for i=1:length(t)         
     
     
-    % *%TODO* :
+    % ** :
     %For each time stamp update the Range of the Target for constant velocity. 
-    
-    % *%TODO* :
+    r_t(i) = range + velocity*t(i);
+    td(i) = 2*r_t(i)/c;
+
+    % ** :
     %For each time sample we need update the transmitted and
     %received signal. 
-    Tx(i) = 
-    Rx (i)  =
+    Tx(i) = cos(2*pi*(fc*t(i) + slope*(t(i)^2)/2));
+    Rx(i) = cos(2*pi*(fc*(t(i)-td(i)) + slope*((t(i)-td(i))^2)/2));
     
-    % *%TODO* :
+    % ** :
     %Now by mixing the Transmit and Receive generate the beat signal
     %This is done by element wise matrix multiplication of Transmit and
     %Receiver Signal
-    Mix(i) = 
+    Mix(i) = Tx(i).*Rx(i);
     
 end
 
