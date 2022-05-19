@@ -6,18 +6,66 @@ See https://video.udacity-data.com/topher/2019/May/5ce36479_radar-target-generat
 
 ## 2D CFAR Process
 
-### 1.Determine the number of Training & Guard cells for each dimension.
+### Step 1
 
-### 2.Slide the cell under test across the complete matrix. Make sure the CUT has margin for Training and Guard cells from the edges.
+Determine the number of Training & Guard cells for each dimension.
 
-### 3.For every iteration sum the signal level within all the training cells. To sum convert the value from logarithmic to linear using db2pow function.
+% ** :
+%Select the number of Training Cells in both the dimensions.
+Tr = 10;
+Td = 8;
 
-### 4.Average the summed values for all of the training cells used. After averaging convert it back to logarithmic using pow2db.
+% ** :
+%Select the number of Guard Cells in both dimensions around the Cell under 
+%test (CUT) for accurate estimation
+Gr = 4;
+Gd = 4;
 
-### 5.Further add the offset to it to determine the threshold.
+% ** :
+% offset the threshold by SNR value in dB
+offset = 6;
 
-### 6.Next, compare the signal under CUT against this threshold.
+### Step 2-7 (the main loop)
 
-### 7.If the CUT level > threshold assign it a value of 1, else equate it to 0.
+(2) Slide the cell under test across the complete matrix. Make sure the CUT has margin for Training and Guard cells from the edges.
 
-### 8.To keep the map size same as it was before CFAR, equate all the non-thresholded cells to 0.
+(3) For every iteration sum the signal level within all the training cells. To sum convert the value from logarithmic to linear using db2pow function.
+
+(4) Average the summed values for all of the training cells used. After averaging convert it back to logarithmic using pow2db.
+
+(5) Further add the offset to it to determine the threshold.
+
+(6) Next, compare the signal under CUT against this threshold.
+
+(7) If the CUT level > threshold assign it a value of 1, else equate it to 0.
+
+for i = Tr+Gr+1 : Nr-(Tr+Gr)
+    for j = Td+Gd+1 : Nd-(Td+Gd)
+        noise_level = zeros(1,1);
+   % Use RDM[x,y] as the matrix from the output of 2D FFT for implementing
+   % CFAR
+        for p = i-(Tr+Gr) : i+Tr+Gr
+            for q = j-(Td+Gd) : j+Td+Gd 
+                if (abs(i-p)>Gr || abs(j-q)>Gd)
+                    noise_level = noise_level + db2pow(RDM(p,q));
+                end
+            end
+        end
+    
+        threshold = pow2db(noise_level/(2*(Td+Gd+1)*2*(Tr+Gr+1) - (Gr*Gd) - 1)) + offset;
+
+        if(RDM(i,j)>threshold)
+            RDM(i,j) = 1;
+        else
+            RDM(i,j) = 0;
+        end
+
+    end
+end
+
+
+### Step8
+
+To keep the map size same as it was before CFAR, equate all the non-thresholded cells to 0.
+
+RDM(RDM ~= 0 & RDM ~= 1) = 0;
