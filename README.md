@@ -39,6 +39,10 @@ offset = 6;
 
 (7) If the CUT level > threshold assign it a value of 1, else equate it to 0.
 
+
+
+% Step (2)
+
 for i = Tr+Gr+1 : Nr-(Tr+Gr)
 
     for j = Td+Gd+1 : Nd-(Td+Gd)
@@ -51,7 +55,7 @@ for i = Tr+Gr+1 : Nr-(Tr+Gr)
             
                 if (abs(i-p)>Gr || abs(j-q)>Gd)
                 
-                    noise_level = noise_level + db2pow(RDM(p,q));
+                    noise_level = noise_level + db2pow(RDM(p,q)); % Step (3)
                     
                 end
                 
@@ -59,8 +63,12 @@ for i = Tr+Gr+1 : Nr-(Tr+Gr)
             
         end
     
+        % Steps (4) and (5)
+        
         threshold = pow2db(noise_level/(2*(Td+Gd+1)*2*(Tr+Gr+1) - (Gr*Gd) - 1)) + offset;
-
+        
+        % Steps (6) and (7)
+        
         if(RDM(i,j)>threshold)
             RDM(i,j) = 1;
         else
@@ -72,7 +80,7 @@ for i = Tr+Gr+1 : Nr-(Tr+Gr)
 end
 
 
-### Step8
+### Step 8
 
 To keep the map size same as it was before CFAR, equate all the non-thresholded cells to 0.
 
