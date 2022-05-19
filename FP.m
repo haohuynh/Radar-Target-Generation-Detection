@@ -150,22 +150,28 @@ figure,surf(doppler_axis,range_axis,RDM);
 
 %Slide Window through the complete Range Doppler Map
 
-% *%TODO* :
+% ** :
 %Select the number of Training Cells in both the dimensions.
+Tr = 10;
+Td = 8;
 
-% *%TODO* :
+% ** :
 %Select the number of Guard Cells in both dimensions around the Cell under 
 %test (CUT) for accurate estimation
+Gr = 4;
+Gd = 4;
 
-% *%TODO* :
+% ** :
 % offset the threshold by SNR value in dB
+offset = 6;
 
-% *%TODO* :
+% ** :
 %Create a vector to store noise_level for each iteration on training cells
-noise_level = zeros(1,1);
+%noise_level = zeros(1,1);
+%See the below loop for the elimination of such as a vector
+Nr = Nr/2; % See RANGE DOPPLER RESPONSE
 
-
-% *%TODO* :
+% ** :
 %design a loop such that it slides the CUT across range doppler map by
 %giving margins at the edges for Training and Guard Cells.
 %For every iteration sum the signal level within all the training
@@ -175,33 +181,41 @@ noise_level = zeros(1,1);
 %Further add the offset to it to determine the threshold. Next, compare the
 %signal under CUT with this threshold. If the CUT level > threshold assign
 %it a value of 1, else equate it to 0.
-
-
+for i = Tr+Gr+1 : Nr-(Tr+Gr)
+    for j = Td+Gd+1 : Nd-(Td+Gd)
+        noise_level = zeros(1,1);
    % Use RDM[x,y] as the matrix from the output of 2D FFT for implementing
    % CFAR
+        for p = i-(Tr+Gr) : i+Tr+Gr
+            for q = j-(Td+Gd) : j+Td+Gd 
+                if (abs(i-p)>Gr || abs(j-q)>Gd)
+                    noise_level = noise_level + db2pow(RDM(p,q));
+                end
+            end
+        end
+    
+        threshold = pow2db(noise_level/(2*(Td+Gd+1)*2*(Tr+Gr+1) - (Gr*Gd) - 1)) + offset;
 
+        if(RDM(i,j)>threshold)
+            RDM(i,j) = 1;
+        else
+            RDM(i,j) = 0;
+        end
 
-
-
-
-% *%TODO* :
+    end
+end
+% ** :
 % The process above will generate a thresholded block, which is smaller 
 %than the Range Doppler Map as the CUT cannot be located at the edges of
 %matrix. Hence,few cells will not be thresholded. To keep the map size same
 % set those values to 0. 
- 
+RDM(RDM ~= 0 & RDM ~= 1) = 0;
 
 
-
-
-
-
-
-
-% *%TODO* :
+% ** :
 %display the CFAR output using the Surf function like we did for Range
 %Doppler Response output.
-figure,surf(doppler_axis,range_axis,'replace this with output');
+figure,surf(doppler_axis,range_axis,RDM);
 colorbar;
 
 
